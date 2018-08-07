@@ -1,0 +1,23 @@
+<launch>
+
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+
+  <!-- send robot urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro.py ur10_2.urdf.xacro"/>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model ur10 -z 0.1" respawn="false" output="screen" />
+
+  <!-- send controllers to param server -->
+  <rosparam command="load" file="controllers_2.yaml"/>
+
+  <!-- start controller_manager and spawn controllers -->
+  <node name="controller_manager" pkg="controller_manager" type="spawner" args="joint_controller"/>
+
+  <!-- Robot state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+
+</launch>
